@@ -1,0 +1,1775 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Attendify - Smart Attendance & Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 6s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+            transition: left 0.6s;
+        }
+        
+        .card-hover:hover::before {
+            left: 100%;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .floating-animation {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%,
+            100% {
+                transform: translateY(0) rotate(0)
+            }
+            33% {
+                transform: translateY(-10px) rotate(2deg)
+            }
+            66% {
+                transform: translateY(-5px) rotate(-2deg)
+            }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.4);
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.6s cubic-bezier(.25, .46, .45, .94);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+            to {
+                opacity: 1
+            }
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.5s cubic-bezier(.25, .46, .45, .94);
+        }
+        
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(.8)
+            }
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(10px);
+            animation: backdropFadeIn 0.3s ease;
+        }
+        
+        @keyframes backdropFadeIn {
+            from {
+                opacity: 0
+            }
+            to {
+                opacity: 1
+            }
+        }
+        
+        .modal-content {
+            animation: modalSlideUp 0.4s cubic-bezier(.25, .46, .45, .94);
+        }
+        
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(.9)
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+            background-size: 200% 100%;
+            animation: progressShimmer 2s linear infinite;
+        }
+        
+        @keyframes progressShimmer {
+            0% {
+                background-position: -200% 0
+            }
+            100% {
+                background-position: 200% 0
+            }
+        }
+        
+        .button-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .button-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width .6s, height .6s;
+        }
+        
+        .button-ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .scanner-line {
+            animation: scannerMove 2s linear infinite;
+        }
+        
+        @keyframes scannerMove {
+            0% {
+                top: 0%
+            }
+            50% {
+                top: 100%
+            }
+            100% {
+                top: 0%
+            }
+        }
+        
+        .success-checkmark {
+            animation: checkmarkDraw 0.8s ease-out;
+        }
+        
+        @keyframes checkmarkDraw {
+            0% {
+                opacity: 0;
+                transform: scale(0)
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2)
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen font-sans overflow-x-hidden">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen gradient-bg flex items-center justify-center p-4">
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8 w-full max-w-md scale-in">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4 floating-animation">
+                    <span class="text-3xl">📚</span>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Attendify</h1>
+                <p class="text-gray-600">Smart Attendance & Learning Platform</p>
+            </div>
+
+            <div class="space-y-4 slide-in" id="loginButtons">
+                <button id="teacherBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 button-ripple card-hover transform hover:scale-105">
+          <span class="text-xl">👨‍🏫</span>
+          <span>Teacher Login</span>
+        </button>
+                <button id="studentBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 button-ripple card-hover transform hover:scale-105">
+          <span class="text-xl">👨‍🎓</span>
+          <span>Student Login</span>
+        </button>
+            </div>
+
+            <div id="loginForm" class="hidden mt-6 fade-in">
+                <label class="block text-sm text-gray-700">I am a</label>
+                <select id="roleSelect" class="w-full border border-gray-300 rounded-lg p-3 mt-2 focus:ring-2 focus:ring-blue-500 transition">
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+        </select>
+
+                <label class="block text-sm text-gray-700 mt-4">Name</label>
+                <input id="nameInput" class="w-full border border-gray-300 rounded-lg p-3 mt-2 focus:ring-2 focus:ring-blue-500 transition" placeholder="Your name" />
+
+                <div class="flex mt-4 space-x-2">
+                    <button id="loginSubmit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg transition button-ripple">Login</button>
+                    <button id="loginCancel" class="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-lg transition">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Dashboard -->
+    <div id="teacherDashboard" class="hidden min-h-screen bg-gray-50">
+        <div class="gradient-bg text-white p-6 shadow-lg">
+            <div class="flex justify-between items-center fade-in">
+                <div>
+                    <h1 class="text-3xl font-bold">Teacher Dashboard</h1>
+                    <p class="opacity-90 text-lg" id="teacherWelcome">Welcome back, Professor</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="teacherCreateClassBtn" class="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-all duration-300 backdrop-blur button-ripple">Create Class</button>
+                    <button id="teacherLogout" class="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-all duration-300 backdrop-blur button-ripple">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+            <div class="grid grid-cols-2 gap-6 slide-in">
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                    <div class="text-3xl font-bold text-blue-600 stats-counter" id="statActiveClasses">0</div>
+                    <div class="text-gray-600">Active Classes</div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                    <div class="text-3xl font-bold text-green-600 stats-counter" id="statTotalStudents">0</div>
+                    <div class="text-gray-600">Total Students</div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover cursor-pointer slide-in" id="cardGenerateQR" style="animation-delay: 0.1s">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center pulse-glow">
+                            <span class="text-2xl">➕</span>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">Generate QR for class</h3>
+                            <p class="text-gray-600">Create a class and get a unique QR code students can scan</p>
+                        </div>
+                    </div>
+                    <!-- QR Countdown Section -->
+                    <div class="mt-6 flex flex-col items-center">
+                        <div id="qrCountdown" class="text-3xl font-bold text-white bg-gradient-to-r from-blue-500 via-green-400 to-fuchsia-400 px-6 py-2 rounded-full shadow-lg mb-2">30s</div>
+                        <button id="qrStopBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-2 rounded-full shadow-lg transition-all">Stop</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover cursor-pointer slide-in" id="cardViewLeaderboard" style="animation-delay: 0.4s">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center pulse-glow">
+                            <span class="text-2xl crown-animation">🏆</span>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">View Leaderboard</h3>
+                            <p class="text-gray-600">See top performing students</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="teacherClassesList" class="space-y-3"></div>
+        </div>
+
+        <!-- Student Attendance Analytics Button -->
+        <div class="p-6">
+            <button id="attendanceAnalyticsBtn" class="bg-gradient-to-r from-blue-500 via-green-400 to-fuchsia-400 text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition-all text-lg flex items-center gap-2">
+                <span class="text-2xl">📊</span> Student Attendance Analytics
+            </button>
+        </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="hidden min-h-screen bg-gray-50">
+        <div class="gradient-bg text-white p-6 shadow-lg">
+            <div class="flex justify-between items-center fade-in">
+                <div>
+                    <h1 class="text-3xl font-bold">Student Dashboard</h1>
+                    <p class="opacity-90 text-lg" id="studentWelcome">Hi, Student</p>
+                </div>
+                <div>
+                    <button id="studentLogout" class="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-all duration-300 backdrop-blur button-ripple">Logout</button>
+                </div>
+            </div>
+        </div>
+        <!-- Profile Card -->
+        <div class="p-6">
+            <div id="studentProfileCard" class="bg-white rounded-xl p-6 shadow-lg card-hover mb-6 cursor-pointer flex items-center space-x-6">
+                <div class="w-20 h-20 rounded-full bg-blue-200 flex items-center justify-center text-4xl font-bold text-blue-700">👤</div>
+                <div>
+                    <div class="text-xl font-bold text-blue-700" id="profileName">Student Name</div>
+                    <div class="text-sm text-gray-600">Regd No: <span id="profileRegd">-</span></div>
+                    <div class="text-sm text-gray-600">Phone: <span id="profilePhone">-</span></div>
+                </div>
+            </div>
+        </div>
+        <!-- Performance Analysis Section -->
+        <div class="p-6">
+            <div class="bg-white rounded-xl p-6 shadow-lg card-hover mb-6">
+                <h3 class="font-semibold text-gray-800 text-lg mb-4">Performance Analysis</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex flex-col items-center">
+                        <div class="text-lg font-bold text-blue-600 mb-2">Attendance Analysis</div>
+                        <div class="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                            <span id="studentAttendancePct" class="text-3xl font-bold text-blue-600">85%</span>
+                        </div>
+                        <div class="w-full bg-blue-200 rounded-full h-3">
+                            <div id="studentAttendanceBar" class="bg-blue-500 h-3 rounded-full transition-all duration-1000" style="width:85%"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-lg font-bold text-green-600 mb-2">Quizzes</div>
+                        <div class="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mb-2">
+                            <span id="studentQuizPct" class="text-3xl font-bold text-green-600">70%</span>
+                        </div>
+                        <div class="w-full bg-green-200 rounded-full h-3">
+                            <div id="studentQuizBar" class="bg-green-500 h-3 rounded-full transition-all duration-1000" style="width:70%"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-lg font-bold text-purple-600 mb-2">Level</div>
+                        <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center mb-2">
+                            <span id="studentLevelPct" class="text-3xl font-bold text-purple-600">60%</span>
+                        </div>
+                        <div class="w-full bg-purple-200 rounded-full h-3">
+                            <div id="studentLevelBar" class="bg-purple-500 h-3 rounded-full transition-all duration-1000" style="width:60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Redeem Points Section -->
+        <div class="p-6">
+            <div class="bg-white rounded-xl p-6 shadow-lg card-hover mb-6">
+                <h3 class="font-semibold text-fuchsia-700 text-lg mb-4">Redeem Points</h3>
+                <div class="flex justify-between items-center mb-2">
+                    <div class="font-bold text-sky-700">Total Points</div>
+                    <div id="redeemTotal" class="text-xl font-bold text-indigo-700">120</div>
+                </div>
+                <div class="flex justify-between items-center mb-2">
+                    <div class="font-bold text-pink-700">Redeemed</div>
+                    <div id="redeemUsed" class="text-xl font-bold text-pink-600">0</div>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <div class="font-bold text-green-700">Remaining</div>
+                    <div id="redeemRest" class="text-xl font-bold text-green-600">120</div>
+                </div>
+                <button id="redeemBtn" class="bg-gradient-to-r from-amber-400 via-fuchsia-400 to-sky-400 text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition-all mb-4">Redeem</button>
+                <div id="redeemOptions" class="hidden mt-4 flex gap-4 justify-center">
+                    <button class="redeemOpt bg-orange-100 hover:bg-orange-200 text-orange-700 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2" data-amount="60"><span>🍕</span> PizzaHut (60 pts)</button>
+                    <button class="redeemOpt bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2" data-amount="40"><span>☕</span> Coffee (40 pts)</button>
+                </div>
+                <div id="redeemStatus" class="mt-3 text-center text-green-600 font-bold"></div>
+            </div>
+        </div>
+        <div class="p-6 space-y-6">
+            <div class="bg-white rounded-xl p-6 shadow-lg card-hover slide-in">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold text-gray-800 text-lg">Your Progress</h3>
+                    <div class="text-3xl font-bold text-green-600 stats-counter" id="studentPoints">0 pts</div>
+                </div>
+
+                <div class="w-full bg-gray-200 rounded-full h-4 mb-4 overflow-hidden">
+                    <div class="progress-bar h-4 rounded-full transition-all duration-1000 ease-out" id="studentProgressBar" style="width: 0%"></div>
+                </div>
+
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span id="studentLevel">Level 0</span>
+                    <span id="studentToNext">0 pts to Level 1</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-lg card-hover slide-in" style="animation-delay: 0.1s">
+                <h3 class="font-semibold text-gray-800 text-lg mb-4">Your Badges</h3>
+                <div class="flex space-x-4" id="studentBadges"></div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover cursor-pointer slide-in" id="btnJoinClass" style="animation-delay: 0.2s">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center pulse-glow">
+                            <span class="text-2xl">🎯</span>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">Join Class</h3>
+                            <p class="text-gray-600">Upload or paste image to join (open given image)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover cursor-pointer slide-in" id="btnScanQR" style="animation-delay: 0.3s">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center pulse-glow">
+                            <span class="text-2xl">📱</span>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">Scan Attendance</h3>
+                            <p class="text-gray-600">Scan QR code to mark attendance</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover cursor-pointer slide-in" id="btnTakeQuizzes" style="animation-delay: 0.4s">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center pulse-glow">
+                            <span class="text-2xl">📝</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-semibold text-gray-800 text-lg">Take Quizzes</h3>
+                                <span class="bg-red-500 text-white text-xs px-3 py-1 rounded-full pulse-glow" id="newQuizzesBadge">0 New</span>
+                            </div>
+                            <p class="text-gray-600">Select your branch and take 10 quizzes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg card-hover cursor-pointer slide-in" id="btnStudentLeaderboard" style="animation-delay: 0.5s">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center pulse-glow">
+                            <span class="text-2xl crown-animation">🏆</span>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">Leaderboard</h3>
+                            <p class="text-gray-600">See your ranking</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="studentClassesList" class="space-y-3"></div>
+        </div>
+
+        <!-- Account Section Button at Bottom -->
+        <div class="w-full p-4 flex justify-center bg-white/80 border-t border-gray-200">
+            <button id="openAccountModal" class="bg-gradient-to-r from-fuchsia-500 via-sky-400 to-indigo-400 text-white font-bold px-8 py-3 rounded-full shadow-lg hover:scale-105 transition-all text-lg flex items-center gap-2">
+                <span class="text-2xl">💳</span> Account
+            </button>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qrScannerModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md text-center modal-content">
+            <h2 class="text-2xl font-bold mb-6">Scan QR Code</h2>
+            <div id="cameraContainer" class="w-64 h-64 bg-black rounded-lg mx-auto mb-6 relative overflow-hidden camera-animation">
+                <video id="cameraVideo" class="w-full h-full object-cover rounded-lg" autoplay playsinline></video>
+                <canvas id="cameraCanvas" class="hidden"></canvas>
+                <div id="scannerLine" class="absolute w-full h-0.5 bg-green-400 scanner-line opacity-80"></div>
+                <div class="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-green-400"></div>
+                <div class="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-green-400"></div>
+                <div class="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-green-400"></div>
+                <div class="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-green-400"></div>
+                <div id="scanSuccess" class="hidden absolute inset-0 bg-green-500 bg-opacity-90 rounded-lg flex items-center justify-center">
+                    <div class="text-white text-center">
+                        <div class="text-6xl mb-4 success-checkmark">✅</div>
+                        <div class="text-xl font-bold">Successfully Scanned!</div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-gray-600 mb-6">Point your camera at a QR code or paste class code below</p>
+            <input id="qrScanInput" class="w-full border border-gray-300 rounded-lg p-4 mb-6 focus:ring-2 focus:ring-green-500 transition" placeholder="Or paste class code here">
+            <div class="flex space-x-4">
+                <button id="qrCancel" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg transition button-ripple">Cancel</button>
+                <button id="qrMark" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg transition button-ripple">Mark Present</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Display Modal -->
+    <div id="qrDisplayModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md text-center modal-content">
+            <h2 class="text-2xl font-bold mb-6">Class QR Code</h2>
+
+            <div id="qrCodeContainer" class="w-64 h-64 bg-white border-4 border-gray-200 rounded-lg mx-auto mb-6 flex items-center justify-center qr-generate">
+                <div id="generatedQR" class="text-center">
+                    <div class="text-6xl mb-4">⏳</div>
+                    <div class="text-gray-500">Generating...</div>
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <h3 class="text-lg font-semibold mb-2" id="qrClassName">Class Name</h3>
+                <p class="text-gray-600">Students can scan this QR code to join and mark attendance</p>
+                <div class="bg-gray-100 rounded-lg px-4 py-2 mt-4 font-mono text-lg" id="qrClassCode">CLASS123</div>
+            </div>
+
+            <!-- Scan Simulator & Stats -->
+            <div class="mb-4">
+                <label class="block text-sm text-gray-700 mb-2">Expected scans (simulate)</label>
+                <div class="flex space-x-2 mb-2">
+                    <input id="simulateScansInput" type="number" min="0" value="5" class="flex-1 border border-gray-300 rounded px-3 py-2">
+                    <button id="simulateScansBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Simulate</button>
+                </div>
+                <div class="text-sm text-gray-600">Attendees so far: <span id="qrSimCount">0</span></div>
+            </div>
+
+            <div class="flex space-x-4 mt-6">
+                <button id="qrDisplayCancel" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg transition button-ripple">Close</button>
+                <button id="downloadQR" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition button-ripple">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Class Modal -->
+    <div id="createClassModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md modal-content">
+            <h2 class="text-2xl font-bold mb-6 text-center">Create New Class</h2>
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Class Name</label>
+                    <input id="newClassName" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 transition" placeholder="e.g., Mathematics 101">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Generated Class Code</label>
+                    <div class="bg-gray-100 rounded-lg px-4 py-3 font-mono text-xl text-center pulse-glow" id="generatedClassCode">—</div>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button id="createClassCancel" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg transition button-ripple">Cancel</button>
+                    <button id="createClassConfirm" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition button-ripple">Create Class</button>
+                </div>
+
+                <div id="createdClassPreview" class="hidden mt-6 border rounded-lg p-4 bg-gray-50"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Image Modal -->
+    <div id="joinImageModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-lg modal-content">
+            <h2 class="text-2xl font-bold mb-4">Open / Upload Image (Join Class)</h2>
+            <p class="text-gray-600 mb-4">Upload an image or paste an image URL to open the "given image".</p>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm text-gray-700 mb-1">Upload image</label>
+                    <input id="joinImageFile" type="file" accept="image/*" class="w-full">
+                </div>
+
+                <div>
+                    <label class="block text-sm text-gray-700 mb-1">Or paste image URL</label>
+                    <input id="joinImageUrl" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="https://...">
+                </div>
+
+                <div class="mt-3">
+                    <button id="openImagePreviewBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Open Image</button>
+                    <button id="joinImageCloseBtn" class="ml-2 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">Close</button>
+                </div>
+
+                <div id="joinImagePreview" class="hidden mt-4 border rounded p-3 text-center">
+                    <img id="joinImagePreviewImg" src="" alt="Preview" class="mx-auto max-h-80 object-contain">
+                    <div class="mt-2 text-sm text-gray-600">If this is the given image, press "Confirm Join".</div>
+                    <div class="mt-3">
+                        <button id="confirmJoinBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Confirm Join</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Branch Modal -->
+    <div id="quizBranchModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-lg modal-content">
+            <h2 class="text-2xl font-bold mb-4">Select Your Branch</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <button class="branchBtn bg-gray-100 py-3 rounded" data-branch="CSE">CSE</button>
+                <button class="branchBtn bg-gray-100 py-3 rounded" data-branch="CSE(DS)">CSE(DS)</button>
+                <button class="branchBtn bg-gray-100 py-3 rounded" data-branch="AIML">AIML</button>
+                <button class="branchBtn bg-gray-100 py-3 rounded" data-branch="Mechanical">Mechanical</button>
+                <button class="branchBtn bg-gray-100 py-3 rounded" data-branch="Electrical">Electrical</button>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button id="quizBranchCancel" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz List Modal -->
+    <div id="quizListModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-2xl modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold" id="quizListTitle">Quizzes</h2>
+                <button id="quizListClose" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded">Close</button>
+            </div>
+            <div id="quizListContainer" class="grid grid-cols-2 gap-3 max-h-96 overflow-auto"></div>
+        </div>
+    </div>
+
+    <!-- Quiz Player Modal -->
+    <div id="quizPlayerModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-xl modal-content">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-bold" id="quizPlayerTitle">Quiz</h2>
+                <div class="text-sm text-gray-600" id="quizPlayerProgress">0 / 0</div>
+            </div>
+
+            <div id="quizQuestionArea" class="mb-4">
+                <!-- question inserted here -->
+            </div>
+
+            <div class="flex justify-between">
+                <button id="quizPrevBtn" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded">Previous</button>
+                <div>
+                    <button id="quizSubmitBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Submit Quiz</button>
+                    <button id="quizNextBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded ml-2">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-2xl modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Leaderboard</h2>
+                <div>
+                    <button id="shuffleLeaderboard" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded">Shuffle Tokens</button>
+                    <button id="leaderboardClose" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded ml-2">Close</button>
+                </div>
+            </div>
+            <div id="leaderboardList" class="space-y-2 max-h-96 overflow-auto"></div>
+        </div>
+    </div>
+
+    <!-- Student Profile Modal -->
+    <div id="studentProfileModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md modal-content shadow-2xl">
+            <!-- Colored Header -->
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="w-16 h-16 rounded-full bg-blue-200 flex items-center justify-center text-3xl font-bold text-blue-700">👤</div>
+                <div>
+                    <div class="text-xl font-bold text-blue-700" id="modalProfileName">Rudra Narayan Ojha</div>
+                    <div class="text-sm text-blue-700">Regd No: <span id="modalProfileRegd">2301294052</span></div>
+                    <div class="text-sm text-green-700">Phone: <span id="modalProfilePhone">9876543210</span></div>
+                </div>
+            </div>
+            <!-- Tokens Earned/Spent -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-green-100 rounded-lg p-4 text-center">
+                    <div class="text-lg font-bold text-green-700">Tokens Earned</div>
+                    <div class="text-2xl font-bold" id="modalTokensEarned">120</div>
+                </div>
+                <div class="bg-pink-100 rounded-lg p-4 text-center">
+                    <div class="text-lg font-bold text-pink-700">Tokens Spent</div>
+                    <div class="text-2xl font-bold" id="modalTokensSpent">45</div>
+                </div>
+            </div>
+            <!-- Token Spend History -->
+            <div class="mb-4">
+                <div class="font-semibold text-gray-700 mb-2">Token Spend History</div>
+                <div class="space-y-1 text-sm">
+                    <div class="flex items-center justify-between"><span><span class="mr-2">📝</span>Quiz Entry</span><span class="text-gray-600">-5</span></div>
+                    <div class="flex items-center justify-between"><span><span class="mr-2">🏅</span>Badge Redeem</span><span class="text-gray-600">-10</span></div>
+                    <div class="flex items-center justify-between"><span><span class="mr-2">📚</span>Class Join</span><span class="text-gray-600">-2</span></div>
+                </div>
+            </div>
+            <!-- Redeem Points Section -->
+            <div class="mb-6">
+                <div class="font-semibold text-gray-700 mb-2">Redeem Points</div>
+                <div class="flex gap-4 justify-center">
+                    <button id="redeemJuice" class="bg-orange-100 hover:bg-orange-200 text-orange-700 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2"><span>🍹</span> Papu Juice Parlor</button>
+                    <button id="redeemCafe" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2"><span>🍔</span> Ranjit Cafeteria</button>
+                </div>
+                <div id="redeemStatus" class="mt-3 text-center text-green-600 font-bold"></div>
+            </div>
+            <!-- Performance Analysis -->
+            <div class="mb-4">
+                <div class="font-semibold text-gray-700 mb-2">Performance Analysis</div>
+                <div class="flex gap-2 mb-2 justify-center">
+                    <button id="showProfilePie" class="text-blue-700 px-3 py-1 rounded font-semibold underline">Pie Chart</button>
+                    <button id="showProfileBar" class="text-green-700 px-3 py-1 rounded font-semibold">Bar Graph</button>
+                    <button id="showProfileLine" class="text-purple-700 px-3 py-1 rounded font-semibold">Line Graph</button>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-center">
+                    <canvas id="profileChart" width="220" height="120"></canvas>
+                </div>
+                <div class="mt-2 text-center text-lg font-bold text-indigo-700" id="profileChartSummary">Attendance: 70% | Quiz Accuracy: 80%</div>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button id="closeStudentProfileModal" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Modal -->
+    <div id="accountModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md modal-content shadow-2xl">
+            <div class="mb-6 text-center">
+                <div class="text-2xl font-bold text-indigo-700 mb-2">Account Details</div>
+                <div class="text-lg font-semibold text-fuchsia-700">UAI: <span id="accountUAI">uai_cd91212@4052</span></div>
+            </div>
+            <div class="mb-4">
+                <div class="font-semibold text-gray-700 mb-2">Token Transaction History</div>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between bg-blue-50 rounded-lg px-4 py-3 shadow">
+                        <div class="flex items-center gap-2"><span class="text-blue-500 text-xl">📘</span>Math</div>
+                        <div class="font-bold text-blue-700">+100</div>
+                    </div>
+                    <div class="flex items-center justify-between bg-green-50 rounded-lg px-4 py-3 shadow">
+                        <div class="flex items-center gap-2"><span class="text-green-500 text-xl">💻</span>OOPS</div>
+                        <div class="font-bold text-green-700">+80</div>
+                    </div>
+                    <div class="flex items-center justify-between bg-pink-50 rounded-lg px-4 py-3 shadow">
+                        <div class="flex items-center gap-2"><span class="text-pink-500 text-xl">🔬</span>Physics</div>
+                        <div class="font-bold text-pink-700">+60</div>
+                    </div>
+                    <div class="flex items-center justify-between bg-purple-50 rounded-lg px-4 py-3 shadow">
+                        <div class="flex items-center gap-2"><span class="text-purple-500 text-xl">🤖</span>AI</div>
+                        <div class="font-bold text-purple-700">+90</div>
+                    </div>
+                    <div class="flex items-center justify-between bg-yellow-50 rounded-lg px-4 py-3 shadow">
+                        <div class="flex items-center gap-2"><span class="text-yellow-500 text-xl">🧠</span>ML</div>
+                        <div class="font-bold text-yellow-700">+70</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button id="closeAccountModal" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="successToast" class="hidden fixed top-6 right-6 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 toast-slide">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl">✅</span>
+            <span id="toastMessage" class="font-medium">Success!</span>
+        </div>
+    </div>
+
+    <!-- Attendance Analytics Modal -->
+    <div id="attendanceAnalyticsModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-2xl modal-content shadow-2xl">
+            <div class="mb-6 text-center">
+                <div class="text-2xl font-bold text-indigo-700 mb-2">Student Attendance Analytics</div>
+                <div class="text-lg font-semibold text-green-700">Present: <span id="presentCount">30</span> | Absent: <span id="absentCount">20</span></div>
+            </div>
+            <div class="mb-4 max-h-64 overflow-auto">
+                <table class="w-full text-left border rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="p-2">#</th>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Regd No</th>
+                            <th class="p-2">Year</th>
+                            <th class="p-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentAttendanceTable"></tbody>
+                </table>
+            </div>
+            <div class="mb-4">
+                <div class="font-semibold text-gray-700 mb-2">Attendance Graphs</div>
+                <div class="flex gap-2 mb-2 justify-center">
+                    <button id="showAttendanceBar" class="bg-blue-100 text-blue-700 px-3 py-1 rounded font-semibold">Bar Graph</button>
+                    <button id="showAttendancePie" class="bg-green-100 text-green-700 px-3 py-1 rounded font-semibold">Pie Chart</button>
+                    <button id="showAttendanceLine" class="bg-purple-100 text-purple-700 px-3 py-1 rounded font-semibold">Line Graph</button>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-center">
+                    <canvas id="attendanceChart" width="320" height="160"></canvas>
+                </div>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button id="closeAttendanceAnalyticsModal" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Minimal data & state
+        let currentUser = null;
+        let classes = [];
+        let nextClassId = 1;
+        let cameraStream = null;
+        let scanInterval = null;
+
+        // Sample branch quizzes (auto generated simple MCQs)
+        const BRANCHES = ['CSE', 'CSE(DS)', 'AIML', 'Mechanical', 'Electrical'];
+        const quizzesByBranch = {};
+
+        // Generate 10 sample quizzes per branch (10-20 as requested)
+        function generateSampleQuizzes() {
+            BRANCHES.forEach(branch => {
+                const list = [];
+                for (let i = 1; i <= 10; i++) {
+                    list.push({
+                        id: `${branch}_Q${i}`,
+                        title: `${branch} Quiz ${i}`,
+                        question: `Sample ${branch} question number ${i}: What is ${i} + ${i}?`,
+                        options: [{
+                            id: 'a',
+                            text: `${i}`
+                        }, {
+                            id: 'b',
+                            text: `${i * 2}`
+                        }, {
+                            id: 'c',
+                            text: `${i + 3}`
+                        }, {
+                            id: 'd',
+                            text: `${i * i}`
+                        }],
+                        correct: 'b',
+                        reward: 5 + (i % 3) // tokens rewarded
+                    });
+                }
+                quizzesByBranch[branch] = list;
+            });
+        }
+
+        // Leaderboard sample students (15 students)
+        let sampleStudents = [];
+
+        function generateSampleStudents() {
+            const names = [
+                'Rakesh', 'Aisha', 'Vikram', 'Meera', 'Ankit', 'Sana', 'Harish', 'Priya', 'Nikhil', 'Kavya',
+                'Arjun', 'Sneha', 'Rohit', 'Divya', 'Siddharth'
+            ];
+            sampleStudents = names.map((n, idx) => ({
+                id: 'S' + (1000 + idx),
+                name: n,
+                tokens: Math.floor(Math.random() * 300)
+            }));
+        }
+
+        // Utility
+        function $(id) {
+            return document.getElementById(id);
+        }
+
+        function showToast(message, ms = 3000) {
+            const toast = $('successToast');
+            $('toastMessage').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), ms);
+        }
+
+        // QR generator (simple svg-based)
+        function generateQRCodeSVG(text, size = 256) {
+            // Very simple placeholder "QR-like" image (not a real QR encoder).
+            const modules = 21;
+            const moduleSize = size / modules;
+            let svg = `<?xml version="1.0" encoding="UTF-8"?>`;
+            svg += `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+            svg += `<rect width="${size}" height="${size}" fill="white"/>`;
+            const hash = text.split('').reduce((a, b) => {
+                a = ((a << 5) - a) + b.charCodeAt(0);
+                return a | 0;
+            }, 0);
+            for (let row = 0; row < modules; row++) {
+                for (let col = 0; col < modules; col++) {
+                    const shouldFill = ((row + col + Math.abs(hash)) % 3 === 0) || (row < 7 && col < 7) || (row < 7 && col > modules - 8) || (row > modules - 8 && col < 7);
+                    if (shouldFill) {
+                        svg += `<rect x="${col * moduleSize}" y="${row * moduleSize}" width="${moduleSize}" height="${moduleSize}" fill="black"/>`;
+                    }
+                }
+            }
+            svg += `</svg>`;
+            return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+        }
+
+        // Random class code generator
+        function randomCode(prefix = '') {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = (prefix || '') + '-';
+            for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return code;
+        }
+
+        // Camera functions (for scanning simulation)
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment'
+                    }
+                });
+                cameraStream = stream;
+                const video = $('cameraVideo');
+                video.srcObject = stream;
+                video.play();
+                startQRScanning();
+                return true;
+            } catch (err) {
+                console.error('Camera access failed:', err);
+                showToast('Camera access denied. Please use manual code entry.');
+                return false;
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            if (scanInterval) {
+                clearInterval(scanInterval);
+                scanInterval = null;
+            }
+        }
+
+        function startQRScanning() {
+            if (scanInterval) clearInterval(scanInterval);
+            scanInterval = setInterval(() => {
+                if (classes.length > 0 && Math.random() > 0.88) {
+                    const randomClass = classes[Math.floor(Math.random() * classes.length)];
+                    // Simulate detection
+                    simulateQRDetection(randomClass.code);
+                }
+            }, 1400);
+        }
+
+        function simulateQRDetection(classCode) {
+            const successOverlay = $('scanSuccess');
+            successOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                if (currentUser && currentUser.role === 'student') {
+                    markAttendanceFor(classCode, currentUser.id);
+                    showToast(`Successfully joined ${classCode}! Attendance marked.`);
+                } else {
+                    showToast(`Scanned: ${classCode}`);
+                }
+                closeModalById('qrScannerModal');
+                stopCamera();
+                successOverlay.classList.add('hidden');
+            }, 1200);
+        }
+
+        // Attendance marker
+        function markAttendanceFor(classCode, studentId) {
+            const cls = classes.find(c => c.code === classCode);
+            if (!cls) return;
+            if (!cls.attendees) cls.attendees = [];
+            if (!cls.attendees.includes(studentId)) cls.attendees.push(studentId);
+            updateStats();
+            updateClassListUI();
+        }
+
+        // Modal helpers
+        function openModalById(id) {
+            $(id).classList.remove('hidden');
+        }
+
+        function closeModalById(id) {
+            $(id).classList.add('hidden');
+        }
+
+        // Auto-generate QR display
+        function autoGenerateQR(className, classCode) {
+            $('qrDisplayModal').classList.remove('hidden');
+            $('qrClassName').textContent = className;
+            $('qrClassCode').textContent = classCode;
+            $('qrSimCount').textContent = getClassAttendeeCount(classCode);
+            setTimeout(() => {
+                const qrImage = document.createElement('img');
+                qrImage.src = generateQRCodeSVG(classCode, 240);
+                qrImage.className = 'w-full h-full object-contain rounded-lg';
+                qrImage.alt = `QR Code for ${className}`;
+                $('generatedQR').innerHTML = '';
+                $('generatedQR').appendChild(qrImage);
+            }, 300);
+        }
+
+        function getClassAttendeeCount(code) {
+            const c = classes.find(x => x.code === code);
+            return (c && c.attendees) ? c.attendees.length : 0;
+        }
+
+        // Download QR
+        function downloadQRImage() {
+            const img = $('generatedQR').querySelector('img');
+            if (!img) return showToast('No QR to download');
+            const a = document.createElement('a');
+            a.href = img.src;
+            a.download = `${$('qrClassCode').textContent}.svg`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+
+        // UI: stats & lists
+        function updateStats() {
+            $('statActiveClasses').textContent = classes.length;
+            const totalStudents = new Set();
+            classes.forEach(c => {
+                if (c.attendees) c.attendees.forEach(id => totalStudents.add(id));
+            });
+            $('statTotalStudents').textContent = totalStudents.size;
+        }
+
+        function updateClassListUI() {
+            const list = $('teacherClassesList');
+            list.innerHTML = '';
+            classes.forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'bg-white rounded-xl p-4 shadow-lg flex justify-between items-center';
+                el.innerHTML = `
+          <div>
+            <div class="font-semibold">${escapeHtml(c.name)}</div>
+            <div class="text-sm text-gray-500">Code: ${escapeHtml(c.code)} · Attendees: ${c.attendees ? c.attendees.length : 0}</div>
+          </div>
+          <div class="flex space-x-2">
+            <button class="px-3 py-2 bg-blue-600 text-white rounded" onclick="autoGenerateQR('${escapeJs(c.name)}','${escapeJs(c.code)}')">Show QR</button>
+            <button class="px-3 py-2 bg-gray-200 rounded" onclick="simulateAttendeeScan('${escapeJs(c.code)}')">Simulate Scan</button>
+          </div>
+        `;
+                list.appendChild(el);
+            });
+        }
+
+        // Escape helpers for safe insertion in HTML/onclick strings
+        function escapeHtml(s) {
+            return ('' + s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function escapeJs(s) {
+            return ('' + s).replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+
+        // Simulate scanning: add random number of attendees
+        function simulateAttendeeScan(code) {
+            const cls = classes.find(c => c.code === code);
+            if (!cls) return;
+            // simulate between 1 and 5 new unique attendees
+            const toAdd = Math.floor(Math.random() * 5) + 1;
+            for (let i = 0; i < toAdd; i++) {
+                const sid = Date.now().toString(36) + Math.floor(Math.random() * 1000);
+                if (!cls.attendees) cls.attendees = [];
+                if (!cls.attendees.includes(sid)) cls.attendees.push(sid);
+            }
+            updateStats();
+            updateClassListUI();
+            showToast(`Simulated ${toAdd} scan(s) for ${code}`);
+        }
+
+        // Event bindings & flows
+        function bindUI() {
+            // Login buttons
+            $('teacherBtn').addEventListener('click', () => {
+                $('loginButtons').classList.add('hidden');
+                $('loginForm').classList.remove('hidden');
+                $('roleSelect').value = 'teacher';
+            });
+            $('studentBtn').addEventListener('click', () => {
+                $('loginButtons').classList.add('hidden');
+                $('loginForm').classList.remove('hidden');
+                $('roleSelect').value = 'student';
+            });
+            $('loginCancel').addEventListener('click', () => {
+                $('loginForm').classList.add('hidden');
+                $('loginButtons').classList.remove('hidden');
+            });
+
+            $('loginSubmit').addEventListener('click', () => {
+                const name = ($('nameInput').value || 'Guest').trim() || 'Guest';
+                const role = $('roleSelect').value;
+                currentUser = {
+                    id: Date.now().toString(),
+                    name,
+                    role
+                };
+                showToast(`Welcome, ${name}`);
+                $('loginScreen').classList.add('hidden');
+                if (role === 'teacher') {
+                    $('teacherWelcome').textContent = `Welcome back, ${name}`;
+                    $('teacherDashboard').classList.remove('hidden');
+                } else {
+                    $('studentWelcome').textContent = `Hi, ${name}`;
+                    $('studentDashboard').classList.remove('hidden');
+                }
+                updateStats();
+                updateClassListUI();
+                renderStudentLeaderboard(); // ensure leaderboard data is ready
+            });
+
+            // Teacher actions
+            $('teacherCreateClassBtn').addEventListener('click', () => openModalById('createClassModal'));
+            $('createClassCancel').addEventListener('click', () => closeModalById('createClassModal'));
+            $('createClassConfirm').addEventListener('click', () => {
+                const name = ($('newClassName').value || '').trim();
+                if (!name) return showToast('Please enter class name');
+                const code = randomCode(name.split(' ')[0].toUpperCase());
+                const newClass = {
+                    id: nextClassId++,
+                    name,
+                    code,
+                    attendees: []
+                };
+                classes.push(newClass);
+                $('generatedClassCode').textContent = code;
+                $('createdClassPreview').classList.remove('hidden');
+                $('createdClassPreview').innerHTML = `<div><strong>${escapeHtml(name)}</strong><div class="text-sm text-gray-500">Code: ${escapeHtml(code)}</div></div>`;
+                updateStats();
+                updateClassListUI();
+                setTimeout(() => {
+                    closeModalById('createClassModal');
+                    autoGenerateQR(name, code);
+                }, 500);
+            });
+
+            // QR display modal
+            $('qrDisplayCancel').addEventListener('click', () => closeModalById('qrDisplayModal'));
+            $('downloadQR').addEventListener('click', downloadQRImage);
+
+            // Simulate scans button from QR modal
+            $('simulateScansBtn').addEventListener('click', () => {
+                const n = parseInt($('simulateScansInput').value) || 0;
+                const code = $('qrClassCode').textContent;
+                const cls = classes.find(c => c.code === code);
+                if (!cls) {
+                    showToast('Class not found');
+                    return;
+                }
+                for (let i = 0; i < n; i++) {
+                    const sid = 'SIM' + (Date.now().toString(36)) + Math.floor(Math.random() * 1000);
+                    if (!cls.attendees.includes(sid)) cls.attendees.push(sid);
+                }
+                $('qrSimCount').textContent = cls.attendees.length;
+                updateStats();
+                updateClassListUI();
+                showToast(`Simulated ${n} scan(s)`);
+            });
+
+            // Student actions
+            $('btnScanQR').addEventListener('click', async() => {
+                openModalById('qrScannerModal');
+                await startCamera();
+            });
+            $('qrCancel').addEventListener('click', () => {
+                closeModalById('qrScannerModal');
+                stopCamera();
+            });
+            $('qrMark').addEventListener('click', () => {
+                const code = ($('qrScanInput').value || '').trim();
+                if (!code) return showToast('Enter or scan a class code');
+                if (currentUser && currentUser.role === 'student') {
+                    markAttendanceFor(code, currentUser.id);
+                    showToast('Attendance marked');
+                    closeModalById('qrScannerModal');
+                    stopCamera();
+                } else {
+                    showToast('You must be logged in as student');
+                }
+            });
+
+            // Join class (image)
+            $('btnJoinClass').addEventListener('click', () => {
+                $('joinImageFile').value = '';
+                $('joinImageUrl').value = '';
+                $('joinImagePreview').classList.add('hidden');
+                openModalById('joinImageModal');
+            });
+            $('openImagePreviewBtn').addEventListener('click', () => {
+                const fileInput = $('joinImageFile');
+                const url = $('joinImageUrl').value.trim();
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        $('joinImagePreviewImg').src = e.target.result;
+                        $('joinImagePreview').classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else if (url) {
+                    $('joinImagePreviewImg').src = url;
+                    $('joinImagePreview').classList.remove('hidden');
+                } else {
+                    showToast('Upload or paste an image URL first');
+                }
+            });
+            $('joinImageCloseBtn').addEventListener('click', () => closeModalById('joinImageModal'));
+            $('confirmJoinBtn').addEventListener('click', () => {
+                // For demo: marking attendance to first class if student
+                if (currentUser && currentUser.role === 'student') {
+                    if (classes.length === 0) {
+                        showToast('No class available to join');
+                        closeModalById('joinImageModal');
+                        return;
+                    }
+                    const cls = classes[0]; // simplistic: join first class
+                    markAttendanceFor(cls.code, currentUser.id);
+                    showToast(`Joined ${cls.code} via image`);
+                } else {
+                    showToast('Only students can join classes via image');
+                }
+                closeModalById('joinImageModal');
+            });
+
+            // Quizzes: open branch chooser
+            $('btnTakeQuizzes').addEventListener('click', () => {
+                $('newQuizzesBadge').textContent = '0 New';
+                openModalById('quizBranchModal');
+            });
+            document.querySelectorAll('.branchBtn').forEach(b => {
+                b.addEventListener('click', (ev) => {
+                    const branch = ev.currentTarget.dataset.branch;
+                    openQuizListForBranch(branch);
+                });
+            });
+            $('quizBranchCancel').addEventListener('click', () => closeModalById('quizBranchModal'));
+
+            // Quiz list close
+            $('quizListClose').addEventListener('click', () => closeModalById('quizListModal'));
+
+            // Quiz player navigation
+            $('quizPrevBtn').addEventListener('click', () => quizPrev());
+            $('quizNextBtn').addEventListener('click', () => quizNext());
+            $('quizSubmitBtn').addEventListener('click', () => submitQuiz());
+
+            // Leaderboard
+            $('cardViewLeaderboard').addEventListener('click', () => openModalById('leaderboardModal'));
+            $('btnStudentLeaderboard').addEventListener('click', () => openModalById('leaderboardModal'));
+            $('leaderboardClose').addEventListener('click', () => closeModalById('leaderboardModal'));
+            $('shuffleLeaderboard').addEventListener('click', () => {
+                // randomize tokens
+                sampleStudents.forEach(s => s.tokens = Math.floor(Math.random() * 500));
+                renderStudentLeaderboard();
+                showToast('Leaderboard tokens reshuffled');
+            });
+
+            // Generate QR card (teacher)
+            $('cardGenerateQR').addEventListener('click', function() {
+                if (classes.length === 0) {
+                    const newClass = {
+                        id: nextClassId++,
+                        name: 'Quick Class',
+                        code: randomCode('QC'),
+                        attendees: []
+                    };
+                    classes.push(newClass);
+                    updateStats();
+                }
+                const cls = classes[0];
+                autoGenerateQR(cls.name, cls.code);
+                startQRRotation();
+            });
+            $('qrStopBtn').addEventListener('click', stopQRRotation);
+
+            // initialize simulated sample data
+            generateSampleQuizzes();
+            generateSampleStudents();
+
+            // seed example class
+            classes.push({
+                id: nextClassId++,
+                name: 'Mathematics 101',
+                code: 'MATH101',
+                attendees: []
+            });
+            updateStats();
+            updateClassListUI();
+            renderStudentLeaderboard();
+
+            // Student Profile Modal Logic
+            const studentProfileCard = document.getElementById('studentProfileCard');
+            const studentProfileModal = document.getElementById('studentProfileModal');
+            const closeStudentProfileModal = document.getElementById('closeStudentProfileModal');
+            const profileChart = document.getElementById('profileChart');
+            let profileChartInstance = null;
+            studentProfileCard.onclick = function() {
+                document.getElementById('modalProfileName').textContent = 'Rudra Narayan Ojha';
+                document.getElementById('modalProfileRegd').textContent = '2301294052';
+                document.getElementById('modalProfilePhone').textContent = '9876543210';
+                document.getElementById('modalTokensEarned').textContent = '120';
+                document.getElementById('modalTokensSpent').textContent = '45';
+                document.getElementById('redeemStatus').textContent = '';
+                renderProfilePie();
+                studentProfileModal.classList.remove('hidden');
+            };
+            closeStudentProfileModal.onclick = function() {
+                studentProfileModal.classList.add('hidden');
+            };
+
+            document.getElementById('redeemJuice').onclick = function() {
+                document.getElementById('redeemStatus').textContent = 'Redeemed at Papu Juice Parlor! 🎉';
+                document.getElementById('redeemStatus').className = 'mt-3 text-center text-orange-600 font-bold animate-pulse';
+            };
+            document.getElementById('redeemCafe').onclick = function() {
+                document.getElementById('redeemStatus').textContent = 'Redeemed at Ranjit Cafeteria! 🎉';
+                document.getElementById('redeemStatus').className = 'mt-3 text-center text-pink-600 font-bold animate-pulse';
+            };
+
+            function renderProfileBar() {
+                if (profileChartInstance) profileChartInstance.destroy();
+                profileChartInstance = new Chart(profileChart, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Attendance', 'Quiz Accuracy', 'Level'],
+                        datasets: [{
+                            label: 'Performance',
+                            data: [70, 80, 60],
+                            backgroundColor: ['#3b82f6', '#10b981', '#a78bfa'],
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                document.getElementById('profileChartSummary').textContent = 'Attendance: 70% | Quiz Accuracy: 80%';
+            }
+
+            function renderProfilePie() {
+                if (profileChartInstance) profileChartInstance.destroy();
+                profileChartInstance = new Chart(profileChart, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Attendance', 'Quiz Accuracy', 'Level'],
+                        datasets: [{
+                            data: [70, 80, 60],
+                            backgroundColor: ['#3b82f6', '#10b981', '#a78bfa'],
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+                document.getElementById('profileChartSummary').textContent = 'Attendance: 70% | Quiz Accuracy: 80%';
+            }
+
+            function renderProfileLine() {
+                if (profileChartInstance) profileChartInstance.destroy();
+                profileChartInstance = new Chart(profileChart, {
+                    type: 'line',
+                    data: {
+                        labels: ['Attendance', 'Quiz Accuracy', 'Level'],
+                        datasets: [{
+                            label: 'Performance',
+                            data: [70, 80, 60],
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99,102,241,0.2)',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                document.getElementById('profileChartSummary').textContent = 'Attendance: 70% | Quiz Accuracy: 80%';
+            }
+            document.getElementById('showProfileBar').onclick = renderProfileBar;
+            document.getElementById('showProfilePie').onclick = renderProfilePie;
+            document.getElementById('showProfileLine').onclick = renderProfileLine;
+
+            // Account Modal Logic
+            const openAccountModalBtn = document.getElementById('openAccountModal');
+            const accountModal = document.getElementById('accountModal');
+            const closeAccountModal = document.getElementById('closeAccountModal');
+            openAccountModalBtn.addEventListener('click', function() {
+                accountModal.classList.remove('hidden');
+            });
+            closeAccountModal.addEventListener('click', function() {
+                accountModal.classList.add('hidden');
+            });
+
+            // Attendance Analytics
+            const attendanceStudents = [
+                {name:'Rudra Narayan Ojha',regd:'2301294052',year:'B.Tech 3rd Year'},
+                {name:'Priyadarshi Panda',regd:'2301294053',year:'B.Tech 3rd Year'},
+                {name:'Rounak Gupta',regd:'2301294054',year:'B.Tech 3rd Year'},
+                {name:'Rakesh Ranjan Nayak',regd:'2301294055',year:'B.Tech 3rd Year'},
+                {name:'Rahul Ranjan Routray',regd:'2301294056',year:'B.Tech 3rd Year'},
+                {name:'Bichitra Nanda Pradhan',regd:'2301294057',year:'B.Tech 3rd Year'},
+                {name:'Abhijit Pradhan',regd:'2301294058',year:'B.Tech 3rd Year'},
+                {name:'Satyajit Das',regd:'2301294059',year:'B.Tech 3rd Year'},
+                {name:'Aniket Mohanty',regd:'2301294060',year:'B.Tech 3rd Year'},
+                {name:'Subham Kumar Sahoo',regd:'2301294061',year:'B.Tech 3rd Year'},
+                {name:'Debasish Rout',regd:'2301294062',year:'B.Tech 3rd Year'},
+                {name:'Ashutosh Jena',regd:'2301294063',year:'B.Tech 3rd Year'},
+                {name:'Soumya Ranjan Pattnaik',regd:'2301294064',year:'B.Tech 3rd Year'},
+                {name:'Chinmay Tripathy',regd:'2301294065',year:'B.Tech 3rd Year'},
+                {name:'Kunal Behera',regd:'2301294066',year:'B.Tech 3rd Year'},
+                {name:'Pratyush Mishra',regd:'2301294067',year:'B.Tech 3rd Year'},
+                {name:'Bibhu Prasad Mohapatra',regd:'2301294068',year:'B.Tech 3rd Year'},
+                {name:'Anshuman Sahu',regd:'2301294069',year:'B.Tech 3rd Year'},
+                {name:'Pranab Kumar Swain',regd:'2301294070',year:'B.Tech 3rd Year'},
+                {name:'Alok Ranjan Mallick',regd:'2301294071',year:'B.Tech 3rd Year'},
+                {name:'Tushar Kumar Panda',regd:'2301294072',year:'B.Tech 3rd Year'},
+                {name:'Smaran Kumar Pattnaik',regd:'2301294073',year:'B.Tech 3rd Year'},
+                {name:'Pritam Ranjan Barik',regd:'2301294074',year:'B.Tech 3rd Year'},
+                {name:'Gopal Chandra Nayak',regd:'2301294075',year:'B.Tech 3rd Year'},
+                {name:'Biswajit Kumar Das',regd:'2301294076',year:'B.Tech 3rd Year'},
+                {name:'Sandeep Kumar Rout',regd:'2301294077',year:'B.Tech 3rd Year'},
+                {name:'Rajat Kumar Sahoo',regd:'2301294078',year:'B.Tech 3rd Year'},
+                {name:'Satyabrata Mohanty',regd:'2301294079',year:'B.Tech 3rd Year'},
+                {name:'Rohan Pradhan',regd:'2301294080',year:'B.Tech 3rd Year'},
+                {name:'Arpan Kumar Dash',regd:'2301294081',year:'B.Tech 3rd Year'},
+                {name:'Pankaj Kumar Baral',regd:'2301294082',year:'B.Tech 3rd Year'},
+                {name:'Dipanjan Samal',regd:'2301294083',year:'B.Tech 3rd Year'},
+                {name:'Debasis Behera',regd:'2301294084',year:'B.Tech 3rd Year'},
+                {name:'Manoranjan Panda',regd:'2301294085',year:'B.Tech 3rd Year'},
+                {name:'Harshit Ranjan Sahu',regd:'2301294086',year:'B.Tech 3rd Year'},
+                {name:'Niranjan Kumar Nayak',regd:'2301294087',year:'B.Tech 3rd Year'},
+                {name:'Saurav Kumar Rout',regd:'2301294088',year:'B.Tech 3rd Year'},
+                {name:'Sujeet Kumar Swain',regd:'2301294089',year:'B.Tech 3rd Year'},
+                {name:'Surajit Mohanty',regd:'2301294090',year:'B.Tech 3rd Year'},
+                {name:'Chandan Kumar Sahoo',regd:'2301294091',year:'B.Tech 3rd Year'},
+                {name:'Prakash Kumar Singh',regd:'2301294092',year:'B.Tech 3rd Year'},
+                {name:'Debendra Kumar Nayak',regd:'2301294093',year:'B.Tech 3rd Year'},
+                {name:'Shubham Ranjan Parida',regd:'2301294094',year:'B.Tech 3rd Year'},
+                {name:'Tanmay Kumar Das',regd:'2301294095',year:'B.Tech 3rd Year'},
+                {name:'Akash Ranjan Rout',regd:'2301294096',year:'B.Tech 3rd Year'},
+                {name:'Manas Ranjan Pradhan',regd:'2301294097',year:'B.Tech 3rd Year'},
+                {name:'Utkal Kumar Mohanty',regd:'2301294098',year:'B.Tech 3rd Year'},
+                {name:'Rajesh Kumar Barik',regd:'2301294099',year:'B.Tech 3rd Year'},
+                {name:'Satyam Ranjan Sahu',regd:'2301294100',year:'B.Tech 3rd Year'},
+                {name:'Abhishek Kumar Jena',regd:'2301294101',year:'B.Tech 3rd Year'}
+            ];
+            const presentCount = 30;
+            const absentCount = 20;
+            function renderAttendanceTable() {
+                const tbody = document.getElementById('studentAttendanceTable');
+                tbody.innerHTML = '';
+                attendanceStudents.forEach((s, idx) => {
+                    const status = idx < presentCount ? 'Present' : 'Absent';
+                    const statusColor = status === 'Present' ? 'text-green-600' : 'text-red-500';
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td class="p-2">${idx+1}</td><td class="p-2">${s.name}</td><td class="p-2">${s.regd}</td><td class="p-2">${s.year}</td><td class="p-2 font-bold ${statusColor}">${status}</td>`;
+                    tbody.appendChild(row);
+                });
+            }
+            let attendanceChartInstance = null;
+            function renderAttendanceBar() {
+                if (attendanceChartInstance) attendanceChartInstance.destroy();
+                attendanceChartInstance = new Chart(document.getElementById('attendanceChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Present', 'Absent'],
+                        datasets: [{
+                            label: 'Attendance',
+                            data: [presentCount, absentCount],
+                            backgroundColor: ['#10b981', '#ef4444'],
+                        }]
+                    },
+                    options: {responsive: false, plugins: {legend: {display: false}}}
+                });
+            }
+            function renderAttendancePie() {
+                if (attendanceChartInstance) attendanceChartInstance.destroy();
+                attendanceChartInstance = new Chart(document.getElementById('attendanceChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Present', 'Absent'],
+                        datasets: [{
+                            data: [presentCount, absentCount],
+                            backgroundColor: ['#10b981', '#ef4444'],
+                        }]
+                    },
+                    options: {responsive: false, plugins: {legend: {display: true}}}
+                });
+            }
+            function renderAttendanceLine() {
+                if (attendanceChartInstance) attendanceChartInstance.destroy();
+                attendanceChartInstance = new Chart(document.getElementById('attendanceChart'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Present', 'Absent'],
+                        datasets: [{
+                            label: 'Attendance',
+                            data: [presentCount, absentCount],
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99,102,241,0.2)',
+                            fill: true,
+                        }]
+                    },
+                    options: {responsive: false, plugins: {legend: {display: false}}}
+                });
+            }
+            document.getElementById('attendanceAnalyticsBtn').addEventListener('click', function() {
+                document.getElementById('attendanceAnalyticsModal').classList.remove('hidden');
+                document.getElementById('presentCount').textContent = presentCount;
+                document.getElementById('absentCount').textContent = absentCount;
+                renderAttendanceTable();
+                renderAttendanceBar();
+            });
+            document.getElementById('closeAttendanceAnalyticsModal').addEventListener('click', function() {
+                document.getElementById('attendanceAnalyticsModal').classList.add('hidden');
+            });
+            document.getElementById('showAttendanceBar').addEventListener('click', renderAttendanceBar);
+            document.getElementById('showAttendancePie').addEventListener('click', renderAttendancePie);
+            document.getElementById('showAttendanceLine').addEventListener('click', renderAttendanceLine);
+        }
+
+        // QUIZ FLOW IMPLEMENTATION (simple)
+        let currentQuizSet = [];
+        let currentQuizIndex = 0;
+        let currentQuizAnswers = {}; // id -> chosen option
+
+        function openQuizListForBranch(branch) {
+            closeModalById('quizBranchModal');
+            currentQuizSet = quizzesByBranch[branch] ? quizzesByBranch[branch].slice(0, 10) : [];
+            $('quizListTitle').textContent = `${branch} — ${currentQuizSet.length} quizzes`;
+            const container = $('quizListContainer');
+            container.innerHTML = '';
+            currentQuizSet.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'p-3 border rounded bg-white flex flex-col';
+                card.innerHTML = `<div class="font-semibold">${escapeHtml(q.title)}</div>
+                          <div class="text-sm text-gray-500">${escapeHtml(q.question)}</div>
+                          <div class="mt-2 flex justify-end">
+                            <button class="openQuizBtn bg-blue-600 text-white px-3 py-1 rounded" data-idx="${idx}">Open</button>
+                          </div>`;
+                container.appendChild(card);
+            });
+            // attach handlers
+            container.querySelectorAll('.openQuizBtn').forEach(b => {
+                b.addEventListener('click', (ev) => {
+                    const idx = parseInt(ev.currentTarget.dataset.idx);
+                    startQuizAt(idx);
+                });
+            });
+            openModalById('quizListModal');
+        }
+
+        function startQuizAt(index) {
+            currentQuizIndex = index || 0;
+            currentQuizAnswers = {};
+            renderQuizQuestion();
+            closeModalById('quizListModal');
+            openModalById('quizPlayerModal');
+        }
+
+        function renderQuizQuestion() {
+            const q = currentQuizSet[currentQuizIndex];
+            if (!q) return;
+            $('quizPlayerTitle').textContent = q.title;
+            $('quizPlayerProgress').textContent = `${currentQuizIndex + 1} / ${currentQuizSet.length}`;
+            const area = $('quizQuestionArea');
+            area.innerHTML = `<div class="mb-3 font-medium">${escapeHtml(q.question)}</div>`;
+            q.options.forEach(opt => {
+                const checked = currentQuizAnswers[q.id] === opt.id ? 'checked' : '';
+                const optHtml = `<label class="block p-2 border rounded mb-2 cursor-pointer">
+          <input type="radio" name="opt_${q.id}" value="${opt.id}" ${checked}> <span class="ml-2">${escapeHtml(opt.text)}</span>
+        </label>`;
+                area.insertAdjacentHTML('beforeend', optHtml);
+            });
+            // radio events
+            area.querySelectorAll('input[type=radio]').forEach(r => {
+                r.addEventListener('change', (ev) => {
+                    currentQuizAnswers[q.id] = ev.target.value;
+                });
+            });
+        }
+
+        function quizPrev() {
+            if (currentQuizIndex > 0) {
+                currentQuizIndex--;
+                renderQuizQuestion();
+            }
+        }
+
+        function quizNext() {
+            if (currentQuizIndex < currentQuizSet.length - 1) {
+                currentQuizIndex++;
+                renderQuizQuestion();
+            }
+        }
+
+        function submitQuiz() {
+            // grade simple: count corrects
+            let score = 0;
+            let totalReward = 0;
+            currentQuizSet.forEach(q => {
+                if (currentQuizAnswers[q.id] && currentQuizAnswers[q.id] === q.correct) {
+                    score++;
+                    totalReward += q.reward;
+                }
+            });
+            // award tokens to currentUser
+            if (currentUser && currentUser.role === 'student') {
+                // update student's tokens in sampleStudents or show in studentPoints
+                let s = sampleStudents.find(x => x.name === currentUser.name);
+                if (!s) {
+                    // add to sample students if not present
+                    s = {
+                        id: currentUser.id,
+                        name: currentUser.name,
+                        tokens: 0
+                    };
+                    sampleStudents.push(s);
+                }
+                s.tokens += totalReward;
+                // update student dashboard points
+                const prev = parseInt($('studentPoints').textContent) || 0;
+                const newPts = prev + totalReward;
+                $('studentPoints').textContent = `${newPts} pts`;
+                const pct = Math.min(100, newPts); // simple mapping to progress bar
+                $('studentProgressBar').style.width = `${pct}%`;
+            }
+
+            showToast(`Quiz submitted: ${score}/${currentQuizSet.length} correct — +${totalReward} tokens`);
+            closeModalById('quizPlayerModal');
+            renderStudentLeaderboard();
+        }
+
+        // LEADERBOARD rendering
+        function renderStudentLeaderboard() {
+            const container = $('leaderboardList');
+            // sort descending tokens
+            const combined = sampleStudents.slice().sort((a, b) => b.tokens - a.tokens);
+            container.innerHTML = '';
+            combined.forEach((s, idx) => {
+                const el = document.createElement('div');
+                el.className = 'p-3 border rounded flex justify-between items-center bg-white';
+                el.innerHTML = `<div><div class="font-semibold">${escapeHtml(s.name)}</div><div class="text-xs text-gray-500">ID: ${escapeHtml(s.id)}</div></div>
+                        <div class="text-right">
+                          <div class="text-lg font-bold">${s.tokens} pts</div>
+                          <div class="text-sm text-gray-500">Rank #${idx+1}</div>
+                        </div>`;
+                container.appendChild(el);
+            });
+        }
+
+        // Initialization run
+        document.addEventListener('DOMContentLoaded', () => {
+            bindUI();
+        });
+
+        // Redeem Points
+        let redeemTotal = 120;
+        let redeemUsed = 0;
+        let redeemRest = 120;
+        document.getElementById('redeemBtn').onclick = function() {
+            document.getElementById('redeemOptions').classList.remove('hidden');
+            document.getElementById('redeemStatus').textContent = '';
+        };
+        document.querySelectorAll('.redeemOpt').forEach(btn => {
+            btn.onclick = function() {
+                const amount = parseInt(btn.getAttribute('data-amount'));
+                if (redeemRest >= amount) {
+                    redeemUsed += amount;
+                    redeemRest -= amount;
+                    document.getElementById('redeemUsed').textContent = redeemUsed;
+                    document.getElementById('redeemRest').textContent = redeemRest;
+                    document.getElementById('redeemStatus').textContent = `Redeemed ${amount} pts at ${btn.textContent.trim()}! 🎉`;
+                    document.getElementById('redeemStatus').className = 'mt-3 text-center text-green-600 font-bold animate-pulse';
+                    document.getElementById('redeemOptions').classList.add('hidden');
+                    // Small animation
+                    document.getElementById('redeemTotal').classList.add('animate-pulse');
+                    setTimeout(()=>document.getElementById('redeemTotal').classList.remove('animate-pulse'), 700);
+                } else {
+                    document.getElementById('redeemStatus').textContent = 'Not enough points!';
+                    document.getElementById('redeemStatus').className = 'mt-3 text-center text-red-600 font-bold animate-pulse';
+                }
+            };
+        });
+
+        let qrRotationActive = false;
+        let qrCountdownTimer = null;
+        let qrCountdownValue = 30;
+        function startQRRotation() {
+            qrRotationActive = true;
+            qrCountdownValue = 30;
+            updateQRCountdown();
+            qrCountdownTimer = setInterval(() => {
+                if (!qrRotationActive) return;
+                qrCountdownValue--;
+                updateQRCountdown();
+                if (qrCountdownValue <= 0) {
+                    // Generate new QR code
+                    if (classes.length > 0) {
+                        const cls = classes[0];
+                        autoGenerateQR(cls.name, randomCode(cls.name.split(' ')[0].toUpperCase()));
+                    }
+                    qrCountdownValue = 30;
+                    updateQRCountdown();
+                }
+            }, 1000);
+        }
+        function stopQRRotation() {
+            qrRotationActive = false;
+            if (qrCountdownTimer) clearInterval(qrCountdownTimer);
+            document.getElementById('qrCountdown').textContent = 'Stopped';
+            document.getElementById('qrCountdown').className = 'text-3xl font-bold text-white bg-gradient-to-r from-red-500 via-pink-400 to-yellow-400 px-6 py-2 rounded-full shadow-lg mb-2 animate-pulse';
+        }
+        function updateQRCountdown() {
+            const el = document.getElementById('qrCountdown');
+            el.textContent = qrCountdownValue + 's';
+            el.className = 'text-3xl font-bold text-white bg-gradient-to-r from-blue-500 via-green-400 to-fuchsia-400 px-6 py-2 rounded-full shadow-lg mb-2';
+            if (qrCountdownValue <= 5) el.classList.add('animate-pulse');
+        }
+    </script>
+</body>
+
+</html>
